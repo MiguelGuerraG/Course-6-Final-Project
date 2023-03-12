@@ -1,0 +1,39 @@
+conn_path <- paste("DRIVER=",dsn_driver,
+                  ";DATABASE=",dsn_database,
+                  ";HOSTNAME=",dsn_hostname,
+                  ";PORT=",dsn_port,
+                  ";PROTOCOL=",dsn_protocol,
+                  ";UID=",dsn_uid,
+                  ";PWD=",dsn_pwd,
+                  ";SECURITY=",dsn_security,        
+                    sep="")
+conn <- odbcDriverConnect(conn_path)
+conn
+
+# CROP_DATA:
+sqlQuery(conn, "CREATE TABLE CROP_DATA (CD_ID INTEGER, YEAR DATE, CROP_TYPE VARCHAR(255), GEO VARCHAR(255), SEEDED_AREA INTEGER, HARVESTED_AREA INTEGER, PRODUCTION INTEGER, AVG_YIELD INTEGER)")
+
+# FARM_PRICES:
+sqlQuery(conn, "CREATE TABLE FARM_PRICES (CD_ID INTEGER, DATE DATE, CROP_TYPE VARCHAR(255), GEO VARCHAR(255), PRICE_PRERMT INTEGER)")
+
+# DAILY_FX:
+sqlQuery(conn, "CREATE TABLE DAILY_FX (DFX_ID INTEGER, DATE DATE, FXUSDCAD INTEGER)")
+
+# MONTHLY_FX:
+sqlQuery(conn, "CREATE TABLE MONTHLY_FX (DFX_ID INTEGER, DATE DATE, FXUSDCAD INTEGER)")
+
+
+url1 <- "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-RP0203EN-SkillsNetwork/labs/Final%20Project/Annual_Crop_Data.csv"
+url2 <- "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-RP0203EN-SkillsNetwork/labs/Final%20Project/Monthly_Farm_Prices.csv"
+url3 <- "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-RP0203EN-SkillsNetwork/labs/Final%20Project/Daily_FX.csv"
+url4 <- "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-RP0203EN-SkillsNetwork/labs/Final%20Project/Monthly_FX.csv"
+
+df1 <- read.csv(url1, header = TRUE)
+df2 <- read.csv(url2, header = TRUE)
+df3 <- read.csv(url3, header = TRUE)
+df4 <- read.csv(url4, header = TRUE)
+
+sqlSave(conn, df1, tablename = "CROP_DATA", rownames = FALSE, append = TRUE)
+sqlSave(conn, df2, tablename = "FARM_PRICES", rownames = FALSE, append = TRUE)
+sqlSave(conn, df3, tablename = "DAILY_FX", rownames = FALSE, append = TRUE)
+sqlSave(conn, df4, tablename = "MONTHLY_FX", rownames = FALSE, append = TRUE)
